@@ -1,72 +1,196 @@
+<!-- templates/home.html -->
 {% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard - Financial Planner{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-    <!-- Total Income -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Summary Cards -->
     <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-bold mb-2">Total Income</h2>
-        <p class="text-2xl text-green-600">${{ total_income }}</p>
+        <h3 class="text-lg font-medium text-gray-900">Total Income</h3>
+        <p class="mt-2 text-3xl font-bold text-green-600">${{ total_income }}</p>
+        <p class="text-sm text-gray-500">This month</p>
     </div>
-
-    <!-- Total Expenses -->
+    
     <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-bold mb-2">Total Expenses</h2>
-        <p class="text-2xl text-red-600">${{ total_expenses }}</p>
+        <h3 class="text-lg font-medium text-gray-900">Total Expenses</h3>
+        <p class="mt-2 text-3xl font-bold text-red-600">${{ total_expenses }}</p>
+        <p class="text-sm text-gray-500">This month</p>
     </div>
-
-    <!-- Net Savings -->
+    
     <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-bold mb-2">Net Savings</h2>
-        <p class="text-2xl text-blue-600">${{ net_savings }}</p>
+        <h3 class="text-lg font-medium text-gray-900">Net Savings</h3>
+        <p class="mt-2 text-3xl font-bold text-blue-600">${{ net_savings }}</p>
+        <p class="text-sm text-gray-500">This month</p>
     </div>
-</div>
-
-<!-- Quick Links -->
-<div class="mb-8">
-    <a href="{% url 'add_expense' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Expense</a>
-    <a href="{% url 'add_budget' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Budget</a>
-    <a href="{% url 'add_goal' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Goal</a>
-</div>
-
-<!-- Charts -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    
     <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-bold mb-4">Spending by Category</h2>
-        <canvas id="spendingChart"></canvas>
-    </div>
-    <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-bold mb-4">Budget Overview</h2>
-        <canvas id="budgetChart"></canvas>
+        <h3 class="text-lg font-medium text-gray-900">Budget Status</h3>
+        <p class="mt-2 text-3xl font-bold {% if budget_status < 80 %}text-green-600{% else %}text-yellow-600{% endif %}">{{ budget_status }}%</p>
+        <p class="text-sm text-gray-500">Of monthly budget used</p>
     </div>
 </div>
 
-<!-- Chart.js Script -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+    <!-- Spending by Category -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Spending by Category</h3>
+        <canvas id="categoryChart" class="w-full"></canvas>
+    </div>
+    
+    <!-- Monthly Trends -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Monthly Trends</h3>
+        <canvas id="trendChart" class="w-full"></canvas>
+    </div>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="mt-8 space-y-4">
+    <h3 class="text-lg font-medium text-gray-900 mb-6">Quick Actions</h3>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Add Expense Card -->
+        <a href="{% url 'add_expense' %}" class="group relative overflow-hidden bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">Add Expense</h3>
+                    <p class="text-sm text-gray-500">Record your daily spending</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Create Budget Card -->
+        <a href="{% url 'add_budget' %}" class="group relative overflow-hidden bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100">
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center group-hover:bg-emerald-600 transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-600 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors duration-300">Create Budget</h3>
+                    <p class="text-sm text-gray-500">Plan your monthly spending</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Set New Goal Card -->
+        <a href="{% url 'add_goal' %}" class="group relative overflow-hidden bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 group-hover:text-white transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-300">Set New Goal</h3>
+                    <p class="text-sm text-gray-500">Track your financial goals</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="mt-8">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Transactions</h3>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for transaction in recent_transactions %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.date }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transaction.description }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.category.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {% if transaction.transaction_type == 'EXPENSE' %}text-red-600{% else %}text-green-600{% endif %}">
+                        ${{ transaction.amount }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <script>
-    // Spending Chart
-    const spendingChart = new Chart(document.getElementById('spendingChart'), {
-        type: 'pie',
+    // Category Chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
         data: {
-            labels: {{ spending_categories|safe }},
+            labels: {{ category_labels|safe }},
             datasets: [{
-                data: {{ spending_amounts|safe }},
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                data: {{ category_data|safe }},
+                backgroundColor: [
+                    '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+                    '#6366F1', '#8B5CF6', '#EC4899', '#14B8A6'
+                ]
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
         }
     });
 
-    // Budget Chart
-    const budgetChart = new Chart(document.getElementById('budgetChart'), {
-        type: 'bar',
+    // Trend Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
         data: {
-            labels: {{ budget_categories|safe }},
+            labels: {{ trend_labels|safe }},
             datasets: [{
-                label: 'Budget',
-                data: {{ budget_amounts|safe }},
-                backgroundColor: '#36A2EB',
+                label: 'Income',
+                data: {{ income_trend|safe }},
+                borderColor: '#10B981',
+                tension: 0.1
+            }, {
+                label: 'Expenses',
+                data: {{ expense_trend|safe }},
+                borderColor: '#EF4444',
+                tension: 0.1
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
     });
 </script>

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Create your account
+            </h2>
+        </div>
+        <form class="mt-8 space-y-6" method="POST">
+            {% csrf_token %}
+            <div class="rounded-md shadow-sm -space-y-px">
+                <!-- Custom First Name Field -->
+                <div>
+                    <label for="first_name" class="sr-only">First name</label>
+                    <input id="first_name" name="first_name" type="text" required
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                           placeholder="First name"
+                           value="{{ form.first_name.value|default:'' }}">
+                    {% if form.first_name.errors %}
+                    <div class="text-red-500 text-sm mt-1">
+                        {{ form.first_name.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Custom Last Name Field -->
+                <div>
+                    <label for="last_name" class="sr-only">Last name</label>
+                    <input id="last_name" name="last_name" type="text" required
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                           placeholder="Last name"
+                           value="{{ form.last_name.value|default:'' }}">
+                    {% if form.last_name.errors %}
+                    <div class="text-red-500 text-sm mt-1">
+                        {{ form.last_name.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Custom Email Field -->
+                <div>
+                    <label for="email" class="sr-only">Email</label>
+                    <input id="email" name="email" type="email" required
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                           placeholder="Email"
+                           value="{{ form.email.value|default:'' }}">
+                    {% if form.email.errors %}
+                    <div class="text-red-500 text-sm mt-1">
+                        {{ form.email.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Dynamically Render Remaining Fields (username, password1, password2) -->
+                {% for field in form %}
+                    {% if field.name not in 'first_name last_name email' %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="sr-only">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-red-500 text-sm mt-1">
+                            {{ field.errors|join:", " }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if form.errors %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <span class="block sm:inline">{{ error }}</span>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <span class="block sm:inline">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Sign up
+                </button>
+            </div>
+        </form>
+        <div class="text-center">
+            <p class="mt-2 text-sm text-gray-600">
+                Already have an account?
+                <a href="{% url 'login' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                    Sign in
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
