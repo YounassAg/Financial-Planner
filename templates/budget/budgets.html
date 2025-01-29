@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Budgets - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Budgets</h1>
+
+    <!-- Add Budget Button -->
+    <a href="{% url 'add_budget' %}" class="inline-block mb-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">
+        Add Budget
+    </a>
+
+    <!-- Budgets Table -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Category</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Start Date</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">End Date</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Alert Threshold</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for budget in budgets %}
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ budget.category.name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ budget.amount }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ budget.start_date }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ budget.end_date }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ budget.alert_threshold }}%</td>
+                    <td class="px-6 py-4 text-sm">
+                        <a href="{% url 'edit_budget' budget.id %}" class="text-blue-600 hover:text-blue-800 mr-4">Edit</a>
+                        <a href="{% url 'delete_budget' budget.id %}" class="text-red-600 hover:text-red-800">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

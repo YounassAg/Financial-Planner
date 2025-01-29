@@ -38,7 +38,15 @@
         </div>
         <div class="mb-4">
             <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
-            <input type="text" name="payment_method" id="payment_method" value="{{ expense.payment_method|default:'' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <select name="payment_method" id="payment_method" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select Payment Method</option>
+                <option value="Credit Card" {% if expense.payment_method == "Credit Card" %}selected{% endif %}>Credit Card</option>
+                <option value="Debit Card" {% if expense.payment_method == "Debit Card" %}selected{% endif %}>Debit Card</option>
+                <option value="Cash" {% if expense.payment_method == "Cash" %}selected{% endif %}>Cash</option>
+                <option value="Bank Transfer" {% if expense.payment_method == "Bank Transfer" %}selected{% endif %}>Bank Transfer</option>
+                <option value="PayPal" {% if expense.payment_method == "PayPal" %}selected{% endif %}>PayPal</option>
+                <option value="Other" {% if expense.payment_method == "Other" %}selected{% endif %}>Other</option>
+            </select>
         </div>
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">Update Expense</button>
     </form>

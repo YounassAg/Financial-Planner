@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Income - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Edit Income</h1>
+
+    <form method="post" class="bg-white p-6 rounded-lg shadow-md">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+            <input type="number" name="amount" id="amount" step="0.01" value="{{ income.amount }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+            <select name="category" id="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == income.category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-4">
+            <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+            <input type="date" name="date" id="date" value="{{ income.date|date:'Y-m-d' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea name="description" id="description" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ income.description }}</textarea>
+        </div>
+        <div class="mb-4">
+            <label for="is_recurring" class="block text-sm font-medium text-gray-700">Recurring Income</label>
+            <input type="checkbox" name="is_recurring" id="is_recurring" {% if income.is_recurring %}checked{% endif %} class="mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="recurrence_frequency" class="block text-sm font-medium text-gray-700">Recurrence Frequency</label>
+            <input type="text" name="recurrence_frequency" id="recurrence_frequency" value="{{ income.recurrence_frequency|default:'' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="mb-4">
+            <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
+            <select name="payment_method" id="payment_method" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select Payment Method</option>
+                <option value="Bank Transfer" {% if income.payment_method == "Bank Transfer" %}selected{% endif %}>Bank Transfer</option>
+                <option value="Cash" {% if income.payment_method == "Cash" %}selected{% endif %}>Cash</option>
+                <option value="PayPal" {% if income.payment_method == "PayPal" %}selected{% endif %}>PayPal</option>
+                <option value="Other" {% if income.payment_method == "Other" %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">Update Income</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Details - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Report Details</h1>
+
+    <!-- Report Summary -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h2 class="text-xl font-semibold mb-4">{{ report.report_type }}</h2>
+        <p class="text-sm text-gray-600">Generated on: {{ report.generated_at }}</p>
+        <p class="text-sm text-gray-600">Date Range: {{ report.data.start_date }} to {{ report.data.end_date }}</p>
+    </div>
+
+    <!-- Visualizations -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-lg font-semibold mb-4">Spending Trends</h3>
+        <canvas id="spendingChart" class="w-full h-64"></canvas>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold mb-4">Transactions</h3>
+        <table class="min-w-full">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Category</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Type</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for transaction in report.data.transactions %}
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ transaction.date }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ transaction.amount }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ transaction.category__name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ transaction.transaction_type }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script>
+    const ctx = document.getElementById('spendingChart').getContext('2d');
+    const spendingChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for transaction in report.data.transactions %}
+                    "{{ transaction.date }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Spending',
+                data: [
+                    {% for transaction in report.data.transactions %}
+                        {{ transaction.amount }},
+                    {% endfor %}
+                ],
+                borderColor: '#3b82f6',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

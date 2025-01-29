@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate Report - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Generate Report</h1>
+
+    <form method="post" class="bg-white p-6 rounded-lg shadow-md">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="report_type" class="block text-sm font-medium text-gray-700">Report Type</label>
+            <select name="report_type" id="report_type" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                <option value="Monthly Summary">Monthly Summary</option>
+                <option value="Spending Trends">Spending Trends</option>
+                <option value="Income vs Expenses">Income vs Expenses</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+            <input type="date" name="start_date" id="start_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
+            <input type="date" name="end_date" id="end_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="categories" class="block text-sm font-medium text-gray-700">Categories (Optional)</label>
+            <select name="categories" id="categories" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" multiple>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">Generate Report</button>
+    </form>
+</div>
+{% endblock %}

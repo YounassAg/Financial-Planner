@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Income - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Income</h1>
+
+    <!-- Add Income Button -->
+    <a href="{% url 'add_income' %}" class="inline-block mb-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">
+        Add Income
+    </a>
+
+    <!-- Income Table -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Category</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Description</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for income in income %}
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ income.date }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ income.amount }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ income.category.name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ income.description|default:"-" }}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <a href="{% url 'edit_income' income.id %}" class="text-blue-600 hover:text-blue-800 mr-4">Edit</a>
+                        <a href="{% url 'delete_income' income.id %}" class="text-red-600 hover:text-red-800">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

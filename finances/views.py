@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
 from django.contrib.auth import authenticate, login, logout
+from .models import Transaction, Category, Budget, Goal, Expense, Report
 from .forms import CustomUserCreationForm
+from datetime import datetime, timedelta
+from django.db.models import Sum
 from django.utils import timezone
 from django.contrib import messages
-from datetime import datetime, timedelta
-from .models import Transaction, Category, Budget, Goal, Expense
+from django.http import JsonResponse
 import json
 
 
@@ -279,6 +280,160 @@ def delete_expense(request, expense_id):
     return redirect('expenses')
 
 @login_required
+def budgets(request):
+    # Fetch all budgets for the logged-in user
+    user_budgets = Budget.objects.filter(user=request.user)
+    return render(request, 'budget/budgets.html', {'budgets': user_budgets})
+
+@login_required
+def add_budget(request):
+    if request.method == 'POST':
+        # Get form data
+        category_id = request.POST.get('category')
+        amount = request.POST.get('amount')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        alert_threshold = request.POST.get('alert_threshold')
+
+        # Validate and save the budget
+        if category_id and amount and start_date and end_date:
+            category = Category.objects.get(id=category_id)
+            Budget.objects.create(
+                user=request.user,
+                category=category,
+                amount=amount,
+                start_date=start_date,
+                end_date=end_date,
+                alert_threshold=alert_threshold
+            )
+            messages.success(request, 'Budget added successfully!')
+            return redirect('budgets')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+    else:
+        # Fetch all categories for the dropdown
+        categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
+    return render(request, 'budget/add_budget.html', {'categories': categories})
+
+@login_required
+def edit_budget(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user)
+    if request.method == 'POST':
+        # Get form data
+        category_id = request.POST.get('category')
+        amount = request.POST.get('amount')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        alert_threshold = request.POST.get('alert_threshold')
+
+        # Validate and update the budget
+        if category_id and amount and start_date and end_date:
+            category = Category.objects.get(id=category_id)
+            budget.category = category
+            budget.amount = amount
+            budget.start_date = start_date
+            budget.end_date = end_date
+            budget.alert_threshold = alert_threshold
+            budget.save()
+            messages.success(request, 'Budget updated successfully!')
+            return redirect('budgets')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+    else:
+        # Fetch all categories for the dropdown
+        categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
+    return render(request, 'budget/edit_budget.html', {'budget': budget, 'categories': categories})
+
+@login_required
+def delete_budget(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user)
+    budget.delete()
+    messages.success(request, 'Budget deleted successfully!')
+    return redirect('budgets')
+
+@login_required
+def income(request):
+    # Fetch all income transactions for the logged-in user
+    user_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME')
+    return render(request, 'income/income.html', {'income': user_income})
+
+@login_required
+def add_income(request):
+    if request.method == 'POST':
+        # Get form data
+        amount = request.POST.get('amount')
+        category_id = request.POST.get('category')
+        date = request.POST.get('date')
+        description = request.POST.get('description')
+        is_recurring = request.POST.get('is_recurring') == 'on'
+        recurrence_frequency = request.POST.get('recurrence_frequency')
+        payment_method = request.POST.get('payment_method')
+
+        # Validate and save the income
+        if amount and category_id and date:
+            category = Category.objects.get(id=category_id)
+            Transaction.objects.create(
+                user=request.user,
+                transaction_type='INCOME',
+                amount=amount,
+                category=category,
+                date=date,
+                description=description,
+                is_recurring=is_recurring,
+                recurrence_frequency=recurrence_frequency,
+                payment_method=payment_method
+            )
+            messages.success(request, 'Income added successfully!')
+            return redirect('income')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+    else:
+        # Fetch all categories for the dropdown
+        categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
+    return render(request, 'income/add_income.html', {'categories': categories})
+
+@login_required
+def edit_income(request, income_id):
+    income = get_object_or_404(Transaction, id=income_id, user=request.user, transaction_type='INCOME')
+    if request.method == 'POST':
+        # Get form data
+        amount = request.POST.get('amount')
+        category_id = request.POST.get('category')
+        date = request.POST.get('date')
+        description = request.POST.get('description')
+        is_recurring = request.POST.get('is_recurring') == 'on'
+        recurrence_frequency = request.POST.get('recurrence_frequency')
+        payment_method = request.POST.get('payment_method')
+
+        # Validate and update the income
+        if amount and category_id and date:
+            category = Category.objects.get(id=category_id)
+            income.amount = amount
+            income.category = category
+            income.date = date
+            income.description = description
+            income.is_recurring = is_recurring
+            income.recurrence_frequency = recurrence_frequency
+            income.payment_method = payment_method
+            income.save()
+            messages.success(request, 'Income updated successfully!')
+            return redirect('income')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+    else:
+        # Fetch all categories for the dropdown
+        categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
+    return render(request, 'income/edit_income.html', {'income': income, 'categories': categories})
+
+@login_required
+def delete_income(request, income_id):
+    income = get_object_or_404(Transaction, id=income_id, user=request.user, transaction_type='INCOME')
+    income.delete()
+    messages.success(request, 'Income deleted successfully!')
+    return redirect('income')
+
+
+@login_required
 def budget_list(request):
     budgets = Budget.objects.filter(user=request.user).order_by('category__name')
     
@@ -374,29 +529,64 @@ def delete_category(request, category_id):
     return redirect('categories')
 
 @login_required
-def goal_list(request):
-    goals = Goal.objects.filter(user=request.user).order_by('deadline')
-    return render(request, 'goal/goals.html', {'goals': goals})
+def goals(request):
+    # Fetch all goals for the logged-in user
+    user_goals = Goal.objects.filter(user=request.user)
+    return render(request, 'goal/goals.html', {'goals': user_goals})
 
 @login_required
 def add_goal(request):
     if request.method == 'POST':
+        # Get form data
         name = request.POST.get('name')
         goal_type = request.POST.get('goal_type')
         target_amount = request.POST.get('target_amount')
         deadline = request.POST.get('deadline')
 
-        Goal.objects.create(
-            user=request.user,
-            name=name,
-            goal_type=goal_type,
-            target_amount=target_amount,
-            deadline=deadline
-        )
-
-        return redirect('goals')
-
+        # Validate and save the goal
+        if name and goal_type and target_amount and deadline:
+            Goal.objects.create(
+                user=request.user,
+                name=name,
+                goal_type=goal_type,
+                target_amount=target_amount,
+                deadline=deadline
+            )
+            messages.success(request, 'Goal added successfully!')
+            return redirect('goals')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
     return render(request, 'goal/add_goal.html')
+
+@login_required
+def edit_goal(request, goal_id):
+    goal = get_object_or_404(Goal, id=goal_id, user=request.user)
+    if request.method == 'POST':
+        # Get form data
+        name = request.POST.get('name')
+        goal_type = request.POST.get('goal_type')
+        target_amount = request.POST.get('target_amount')
+        deadline = request.POST.get('deadline')
+
+        # Validate and update the goal
+        if name and goal_type and target_amount and deadline:
+            goal.name = name
+            goal.goal_type = goal_type
+            goal.target_amount = target_amount
+            goal.deadline = deadline
+            goal.save()
+            messages.success(request, 'Goal updated successfully!')
+            return redirect('goals')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+    return render(request, 'goal/edit_goal.html', {'goal': goal})
+
+@login_required
+def delete_goal(request, goal_id):
+    goal = get_object_or_404(Goal, id=goal_id, user=request.user)
+    goal.delete()
+    messages.success(request, 'Goal deleted successfully!')
+    return redirect('goals')
 
 @login_required
 def profile(request):
@@ -411,7 +601,79 @@ def profile(request):
 
 @login_required
 def reports(request):
-    return render(request, 'report/reports.html')
+    # Fetch all reports for the logged-in user
+    user_reports = Report.objects.filter(user=request.user)
+    return render(request, 'report/reports.html', {'reports': user_reports})
+
+@login_required
+def generate_report(request):
+    if request.method == 'POST':
+        # Get form data
+        report_type = request.POST.get('report_type')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        category_ids = request.POST.getlist('categories')
+
+        # Validate and generate the report
+        if report_type and start_date and end_date:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+            # Fetch transactions based on filters
+            transactions = Transaction.objects.filter(
+                user=request.user,
+                date__range=[start_date, end_date]
+            )
+            if category_ids:
+                transactions = transactions.filter(category__id__in=category_ids)
+
+            # Prepare report data
+            report_data = {
+                'report_type': report_type,
+                'start_date': start_date.strftime('%Y-%m-%d'),  # Convert date to string
+                'end_date': end_date.strftime('%Y-%m-%d'),      # Convert date to string
+                'transactions': [
+                    {
+                        'date': transaction.date.strftime('%Y-%m-%d'),  # Convert date to string
+                        'amount': str(transaction.amount),              # Convert Decimal to string
+                        'category__name': transaction.category.name,
+                        'transaction_type': transaction.transaction_type
+                    }
+                    for transaction in transactions
+                ]
+            }
+
+            # Save the report
+            report = Report.objects.create(
+                user=request.user,
+                report_type=report_type,
+                generated_at=datetime.now(),
+                data=report_data
+            )
+            messages.success(request, 'Report generated successfully!')
+            return redirect('report_detail', report_id=report.id)
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+    else:
+        # Fetch all categories for the dropdown
+        categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
+    return render(request, 'report/generate_report.html', {'categories': categories})
+
+@login_required
+def report_detail(request, report_id):
+    # Fetch the report
+    report = get_object_or_404(Report, id=report_id, user=request.user)
+    return render(request, 'report/report_detail.html', {'report': report})
+
+@login_required
+def download_report(request, report_id):
+    # Fetch the report
+    report = get_object_or_404(Report, id=report_id, user=request.user)
+
+    # Prepare the report data for download (e.g., as JSON)
+    response = JsonResponse(report.data, safe=False)
+    response['Content-Disposition'] = f'attachment; filename="report_{report.id}.json"'
+    return response
 
 @login_required
 def settings(request):

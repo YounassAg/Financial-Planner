@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Goals - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Goals</h1>
+
+    <!-- Add Goal Button -->
+    <a href="{% url 'add_goal' %}" class="inline-block mb-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">
+        Add Goal
+    </a>
+
+    <!-- Goals Table -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Name</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Type</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Target Amount</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Deadline</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Progress</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for goal in goals %}
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ goal.name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ goal.get_goal_type_display }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ goal.target_amount }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ goal.deadline }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ goal.progress_percentage }}%"></div>
+                        </div>
+                        <span class="text-xs">{{ goal.progress_percentage }}%</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <a href="{% url 'edit_goal' goal.id %}" class="text-blue-600 hover:text-blue-800 mr-4">Edit</a>
+                        <a href="{% url 'delete_goal' goal.id %}" class="text-red-600 hover:text-red-800">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

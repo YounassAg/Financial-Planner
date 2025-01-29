@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Reports</h1>
+
+    <!-- Generate Report Button -->
+    <a href="{% url 'generate_report' %}" class="inline-block mb-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">
+        Generate Report
+    </a>
+
+    <!-- Reports Table -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Report Type</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Generated At</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for report in reports %}
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ report.report_type }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">{{ report.generated_at }}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <a href="{% url 'report_detail' report.id %}" class="text-blue-600 hover:text-blue-800 mr-4">View</a>
+                        <a href="{% url 'download_report' report.id %}" class="text-green-600 hover:text-green-800">Download</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

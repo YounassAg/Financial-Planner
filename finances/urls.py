@@ -29,6 +29,18 @@ urlpatterns = [
     path('expenses/delete/<int:expense_id>/', views.delete_expense, name='delete_expense'),
     
     # Budget URLs
+    path('budgets/', views.budgets, name='budgets'),
+    path('budgets/add/', views.add_budget, name='add_budget'),
+    path('budgets/edit/<int:budget_id>/', views.edit_budget, name='edit_budget'),
+    path('budgets/delete/<int:budget_id>/', views.delete_budget, name='delete_budget'),
+    
+    # Income URLs
+    path('income/', views.income, name='income'),
+    path('income/add/', views.add_income, name='add_income'),
+    path('income/edit/<int:income_id>/', views.edit_income, name='edit_income'),
+    path('income/delete/<int:income_id>/', views.delete_income, name='delete_income'),
+    
+    # Budget URLs
     path('budgets/', views.budget_list, name='budgets'),
     path('budgets/add/', views.add_budget, name='add_budget'),
     # path('budgets/<int:pk>/edit/', views.edit_budget, name='edit_budget'),
@@ -40,14 +52,16 @@ urlpatterns = [
     path('categories/delete/<int:category_id>/', views.delete_category, name='delete_category'),
     
     # Goal URLs
-    path('goals/', views.goal_list, name='goals'),
+    path('goals/', views.goals, name='goals'),
     path('goals/add/', views.add_goal, name='add_goal'),
-    # path('goals/<int:pk>/edit/', views.edit_goal, name='edit_goal'),
+    path('goals/edit/<int:goal_id>/', views.edit_goal, name='edit_goal'),
+    path('goals/delete/<int:goal_id>/', views.delete_goal, name='delete_goal'),
     
     # Report URLs
     path('reports/', views.reports, name='reports'),
-    # path('reports/generate/', views.generate_report, name='generate_report'),
-    # path('reports/<int:pk>/', views.report_detail, name='report_detail'),
+    path('reports/generate/', views.generate_report, name='generate_report'),
+    path('reports/<int:report_id>/', views.report_detail, name='report_detail'),
+    path('reports/<int:report_id>/download/', views.download_report, name='download_report'),
     
     # Settings URLs
     path('settings/', views.settings, name='settings'),
