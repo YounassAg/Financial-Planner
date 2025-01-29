@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Profile</h1>
+
+<div class="bg-white p-6 rounded-lg shadow">
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label class="block text-gray-700">Currency</label>
+            <input type="text" name="currency" value="{{ profile.currency }}" class="w-full px-4 py-2 border rounded-lg" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700">Monthly Income</label>
+            <input type="number" name="monthly_income" value="{{ profile.monthly_income }}" step="0.01" class="w-full px-4 py-2 border rounded-lg" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700">Savings Target</label>
+            <input type="number" name="savings_target" value="{{ profile.savings_target }}" step="0.01" class="w-full px-4 py-2 border rounded-lg" required>
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Update Profile</button>
+    </form>
+</div>
+{% endblock %}

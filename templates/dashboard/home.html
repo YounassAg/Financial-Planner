@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <!-- Total Income -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-2">Total Income</h2>
+        <p class="text-2xl text-green-600">${{ total_income }}</p>
+    </div>
+
+    <!-- Total Expenses -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-2">Total Expenses</h2>
+        <p class="text-2xl text-red-600">${{ total_expenses }}</p>
+    </div>
+
+    <!-- Net Savings -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-2">Net Savings</h2>
+        <p class="text-2xl text-blue-600">${{ net_savings }}</p>
+    </div>
+</div>
+
+<!-- Quick Links -->
+<div class="mb-8">
+    <a href="{% url 'add_expense' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Expense</a>
+    <a href="{% url 'add_budget' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Budget</a>
+    <a href="{% url 'add_goal' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Goal</a>
+</div>
+
+<!-- Charts -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Spending by Category</h2>
+        <canvas id="spendingChart"></canvas>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Budget Overview</h2>
+        <canvas id="budgetChart"></canvas>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Spending Chart
+    const spendingChart = new Chart(document.getElementById('spendingChart'), {
+        type: 'pie',
+        data: {
+            labels: {{ spending_categories|safe }},
+            datasets: [{
+                data: {{ spending_amounts|safe }},
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+            }]
+        }
+    });
+
+    // Budget Chart
+    const budgetChart = new Chart(document.getElementById('budgetChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ budget_categories|safe }},
+            datasets: [{
+                label: 'Budget',
+                data: {{ budget_amounts|safe }},
+                backgroundColor: '#36A2EB',
+            }]
+        }
+    });
+</script>
+{% endblock %}
