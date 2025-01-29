@@ -142,7 +142,25 @@ def home(request):
 def expenses(request):
     # Fetch all expenses for the logged-in user
     user_expenses = Expense.objects.filter(user=request.user)
-    return render(request, 'expenses/expenses.html', {'expenses': user_expenses})
+    user_categories = Category.objects.filter(user=request.user)
+
+    # Calculate total spending by category
+    spending_by_category = (
+        user_expenses.values('category__name')  # Group by category name
+        .annotate(total_amount=Sum('amount'))  # Sum the amount for each category
+        .order_by('-total_amount')  # Sort by total amount in descending order
+    )
+
+    # Prepare data for the chart
+    expense_categories = [item['category__name'] for item in spending_by_category]
+    expense_amounts = [float(item['total_amount']) for item in spending_by_category]
+
+    return render(request, 'expenses/expenses.html', {
+        'expenses': user_expenses,
+        'user_categories': user_categories,
+        'expense_categories': expense_categories,
+        'expense_amounts': expense_amounts,
+    })
 
 @login_required
 def add_expense(request):
