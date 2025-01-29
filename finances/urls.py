@@ -23,14 +23,21 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     
     # Expense URLs
-    path('expenses/', views.expense_list, name='expenses'),
+    path('expenses/', views.expenses, name='expenses'),
     path('expenses/add/', views.add_expense, name='add_expense'),
-    # path('expenses/<int:pk>/edit/', views.edit_expense, name='edit_expense'),
+    path('expenses/edit/<int:expense_id>/', views.edit_expense, name='edit_expense'),
+    path('expenses/delete/<int:expense_id>/', views.delete_expense, name='delete_expense'),
     
     # Budget URLs
     path('budgets/', views.budget_list, name='budgets'),
     path('budgets/add/', views.add_budget, name='add_budget'),
     # path('budgets/<int:pk>/edit/', views.edit_budget, name='edit_budget'),
+
+    # Categories URLs
+    path('categories/', views.categories, name='categories'),
+    path('categories/add/', views.add_category, name='add_category'),
+    path('categories/edit/<int:category_id>/', views.edit_category, name='edit_category'),
+    path('categories/delete/<int:category_id>/', views.delete_category, name='delete_category'),
     
     # Goal URLs
     path('goals/', views.goal_list, name='goals'),

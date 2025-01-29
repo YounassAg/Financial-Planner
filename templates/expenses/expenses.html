@@ -23,13 +23,13 @@
         <tbody class="divide-y divide-gray-200">
             {% for expense in expenses %}
             <tr>
-                <td class="px-6 py-4">{{ expense.date }}</td>
-                <td class="px-6 py-4">${{ expense.amount }}</td>
-                <td class="px-6 py-4">{{ expense.category }}</td>
-                <td class="px-6 py-4">{{ expense.description }}</td>
-                <td class="px-6 py-4">
-                    <a href="{% url 'edit_expense' expense.id %}" class="text-blue-600 hover:text-blue-800">Edit</a>
-                    <a href="{% url 'delete_expense' expense.id %}" class="text-red-600 hover:text-red-800 ml-2">Delete</a>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ expense.date }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ expense.amount }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ expense.category.name }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ expense.description|default:"-" }}</td>
+                <td class="px-6 py-4 text-sm">
+                    <a href="{% url 'edit_expense' expense.id %}" class="text-blue-600 hover:text-blue-800 mr-4">Edit</a>
+                    <a href="{% url 'delete_expense' expense.id %}" class="text-red-600 hover:text-red-800">Delete</a>
                 </td>
             </tr>
             {% endfor %}

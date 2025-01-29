@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.contrib.auth import authenticate, login, logout
@@ -6,7 +6,7 @@ from .forms import CustomUserCreationForm
 from django.utils import timezone
 from django.contrib import messages
 from datetime import datetime, timedelta
-from .models import Transaction, Category, Budget, Goal
+from .models import Transaction, Category, Budget, Goal, Expense
 import json
 
 
@@ -138,18 +138,15 @@ def home(request):
     return render(request, 'dashboard/home.html', context)
 
 @login_required
-def expense_list(request):
-    expenses = Transaction.objects.filter(
-        user=request.user,
-        transaction_type='EXPENSE'
-    ).order_by('-date')
-    
-    return render(request, 'expenses/expenses.html', {'expenses': expenses})
+def expenses(request):
+    # Fetch all expenses for the logged-in user
+    user_expenses = Expense.objects.filter(user=request.user)
+    return render(request, 'expenses/expenses.html', {'expenses': user_expenses})
 
 @login_required
 def add_expense(request):
     if request.method == 'POST':
-        # Handle form submission
+        # Get form data
         amount = request.POST.get('amount')
         category_id = request.POST.get('category')
         date = request.POST.get('date')
@@ -158,22 +155,128 @@ def add_expense(request):
         recurrence_frequency = request.POST.get('recurrence_frequency')
         payment_method = request.POST.get('payment_method')
 
-        Transaction.objects.create(
-            user=request.user,
-            transaction_type='EXPENSE',
-            amount=amount,
-            category_id=category_id,
-            date=date,
-            description=description,
-            is_recurring=is_recurring,
-            recurrence_frequency=recurrence_frequency,
-            payment_method=payment_method
-        )
+        # Validate and save the expense
+        if amount and category_id and date:
+            category = Category.objects.get(id=category_id)
+            expense = Expense.objects.create(
+                user=request.user,
+                amount=amount,
+                category=category,
+                date=date,
+                description=description,
+                is_recurring=is_recurring,
+                recurrence_frequency=recurrence_frequency,
+                payment_method=payment_method
+            )
 
-        return redirect('expenses')
+            # Create a corresponding transaction for the expense
+            Transaction.objects.create(
+                user=request.user,
+                transaction_type='EXPENSE',
+                amount=amount,
+                category=category,
+                date=date,
+                description=description,
+                is_recurring=is_recurring,
+                recurrence_frequency=recurrence_frequency,
+                payment_method=payment_method
+            )
 
-    categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
+            messages.success(request, 'Expense added successfully!')
+            return redirect('expenses')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+    else:
+        # Fetch all categories for the dropdown
+        categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
     return render(request, 'expenses/add_expense.html', {'categories': categories})
+
+@login_required
+def edit_expense(request, expense_id):
+    expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+    if request.method == 'POST':
+        # Get form data
+        amount = request.POST.get('amount')
+        category_id = request.POST.get('category')
+        date = request.POST.get('date')
+        description = request.POST.get('description')
+        is_recurring = request.POST.get('is_recurring') == 'on'
+        recurrence_frequency = request.POST.get('recurrence_frequency')
+        payment_method = request.POST.get('payment_method')
+
+        # Validate and update the expense
+        if amount and category_id and date:
+            category = Category.objects.get(id=category_id)
+            expense.amount = amount
+            expense.category = category
+            expense.date = date
+            expense.description = description
+            expense.is_recurring = is_recurring
+            expense.recurrence_frequency = recurrence_frequency
+            expense.payment_method = payment_method
+            expense.save()
+
+            # Update the corresponding transaction
+            transaction = Transaction.objects.filter(
+                user=request.user,
+                transaction_type='EXPENSE',
+                date=expense.date,
+                amount=expense.amount,
+                category=expense.category
+            ).first()
+
+            if transaction:
+                transaction.amount = amount
+                transaction.category = category
+                transaction.date = date
+                transaction.description = description
+                transaction.is_recurring = is_recurring
+                transaction.recurrence_frequency = recurrence_frequency
+                transaction.payment_method = payment_method
+                transaction.save()
+            else:
+                # If no corresponding transaction exists, create one
+                Transaction.objects.create(
+                    user=request.user,
+                    transaction_type='EXPENSE',
+                    amount=amount,
+                    category=category,
+                    date=date,
+                    description=description,
+                    is_recurring=is_recurring,
+                    recurrence_frequency=recurrence_frequency,
+                    payment_method=payment_method
+                )
+
+            messages.success(request, 'Expense updated successfully!')
+            return redirect('expenses')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+    else:
+        # Fetch all categories for the dropdown
+        categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
+    return render(request, 'expenses/edit_expense.html', {'expense': expense, 'categories': categories})
+
+@login_required
+def delete_expense(request, expense_id):
+    expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+
+    # Delete the corresponding transaction
+    transaction = Transaction.objects.filter(
+        user=request.user,
+        transaction_type='EXPENSE',
+        date=expense.date,
+        amount=expense.amount,
+        category=expense.category
+    ).first()
+
+    if transaction:
+        transaction.delete()
+
+    # Delete the expense
+    expense.delete()
+    messages.success(request, 'Expense deleted successfully!')
+    return redirect('expenses')
 
 @login_required
 def budget_list(request):
@@ -215,6 +318,60 @@ def add_budget(request):
 
     categories = Category.objects.filter(user=request.user) | Category.objects.filter(is_default=True)
     return render(request, 'budget/add_budget.html', {'categories': categories})
+
+@login_required
+def categories(request):
+    # Fetch all categories for the logged-in user
+    user_categories = Category.objects.filter(user=request.user)
+    default_categories = Category.objects.filter(is_default=True)
+    categories = user_categories | default_categories
+    return render(request, 'categories/categories.html', {'categories': categories})
+
+@login_required
+def add_category(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        parent_id = request.POST.get('parent')
+        parent = Category.objects.get(id=parent_id) if parent_id else None
+
+        # Create the category
+        Category.objects.create(
+            name=name,
+            user=request.user,
+            parent=parent
+        )
+        messages.success(request, 'Category added successfully!')
+        return redirect('categories')
+    else:
+        # Fetch all categories for the parent dropdown
+        categories = Category.objects.filter(user=request.user)
+        return render(request, 'categories/add_category.html', {'categories': categories})
+
+@login_required
+def edit_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id, user=request.user)
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        parent_id = request.POST.get('parent')
+        parent = Category.objects.get(id=parent_id) if parent_id else None
+
+        # Update the category
+        category.name = name
+        category.parent = parent
+        category.save()
+        messages.success(request, 'Category updated successfully!')
+        return redirect('categories')
+    else:
+        # Fetch all categories for the parent dropdown
+        categories = Category.objects.filter(user=request.user).exclude(id=category_id)
+        return render(request, 'categories/edit_category.html', {'category': category, 'categories': categories})
+
+@login_required
+def delete_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id, user=request.user)
+    category.delete()
+    messages.success(request, 'Category deleted successfully!')
+    return redirect('categories')
 
 @login_required
 def goal_list(request):

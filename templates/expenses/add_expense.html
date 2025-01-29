@@ -1,32 +1,54 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Expense{% endblock %}
+{% block title %}Add Expense - Financial Planner{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Add Expense</h1>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Add Expense</h1>
 
-<form method="post" class="bg-white p-6 rounded-lg shadow">
-    {% csrf_token %}
-    <div class="mb-4">
-        <label class="block text-gray-700">Amount</label>
-        <input type="number" name="amount" step="0.01" class="w-full px-4 py-2 border rounded-lg" required>
-    </div>
-    <div class="mb-4">
-        <label class="block text-gray-700">Category</label>
-        <select name="category" class="w-full px-4 py-2 border rounded-lg" required>
-            {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="mb-4">
-        <label class="block text-gray-700">Date</label>
-        <input type="date" name="date" class="w-full px-4 py-2 border rounded-lg" required>
-    </div>
-    <div class="mb-4">
-        <label class="block text-gray-700">Description</label>
-        <textarea name="description" class="w-full px-4 py-2 border rounded-lg"></textarea>
-    </div>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save</button>
-</form>
+    <form method="post" class="bg-white p-6 rounded-lg shadow-md">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+            <input type="number" name="amount" id="amount" step="0.01" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+            <select name="category" id="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-4">
+            <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+            <input type="date" name="date" id="date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea name="description" id="description" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="is_recurring" class="block text-sm font-medium text-gray-700">Recurring Expense</label>
+            <input type="checkbox" name="is_recurring" id="is_recurring" class="mt-1">
+        </div>
+        <div class="mb-4">
+            <label for="recurrence_frequency" class="block text-sm font-medium text-gray-700">Recurrence Frequency</label>
+            <input type="text" name="recurrence_frequency" id="recurrence_frequency" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="mb-4">
+            <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
+            <select name="payment_method" id="payment_method" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select Payment Method</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="PayPal">PayPal</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">Add Expense</button>
+    </form>
+</div>
 {% endblock %}
