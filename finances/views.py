@@ -8,6 +8,8 @@ from django.db.models import Sum
 from django.utils import timezone
 from django.contrib import messages
 from django.http import JsonResponse
+from django.http import HttpResponse
+from .pdf_generator import PDFReportGenerator
 import json
 
 
@@ -626,18 +628,16 @@ def reports(request):
 @login_required
 def generate_report(request):
     if request.method == 'POST':
-        # Get form data
         report_type = request.POST.get('report_type')
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
         category_ids = request.POST.getlist('categories')
 
-        # Validate and generate the report
         if report_type and start_date and end_date:
             start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
 
-            # Fetch transactions based on filters
+            # Fetch transactions
             transactions = Transaction.objects.filter(
                 user=request.user,
                 date__range=[start_date, end_date]
@@ -645,15 +645,22 @@ def generate_report(request):
             if category_ids:
                 transactions = transactions.filter(category__id__in=category_ids)
 
+            # Calculate totals
+            total_income = sum(t.amount for t in transactions if t.transaction_type == 'income')
+            total_expenses = sum(t.amount for t in transactions if t.transaction_type == 'expense')
+
             # Prepare report data
             report_data = {
                 'report_type': report_type,
-                'start_date': start_date.strftime('%Y-%m-%d'),  # Convert date to string
-                'end_date': end_date.strftime('%Y-%m-%d'),      # Convert date to string
+                'start_date': start_date.strftime('%Y-%m-%d'),
+                'end_date': end_date.strftime('%Y-%m-%d'),
+                'total_income': str(total_income),
+                'total_expenses': str(total_expenses),
+                'net_amount': str(total_income - total_expenses),
                 'transactions': [
                     {
-                        'date': transaction.date.strftime('%Y-%m-%d'),  # Convert date to string
-                        'amount': str(transaction.amount),              # Convert Decimal to string
+                        'date': transaction.date.strftime('%Y-%m-%d'),
+                        'amount': str(transaction.amount),
                         'category__name': transaction.category.name,
                         'transaction_type': transaction.transaction_type
                     }
@@ -661,13 +668,14 @@ def generate_report(request):
                 ]
             }
 
-            # Save the report
+            # Save report
             report = Report.objects.create(
                 user=request.user,
                 report_type=report_type,
                 generated_at=datetime.now(),
                 data=report_data
             )
+            
             messages.success(request, 'Report generated successfully!')
             return redirect('report_detail', report_id=report.id)
         else:
@@ -687,10 +695,16 @@ def report_detail(request, report_id):
 def download_report(request, report_id):
     # Fetch the report
     report = get_object_or_404(Report, id=report_id, user=request.user)
-
-    # Prepare the report data for download (e.g., as JSON)
-    response = JsonResponse(report.data, safe=False)
-    response['Content-Disposition'] = f'attachment; filename="report_{report.id}.json"'
+    
+    # Generate PDF
+    pdf_generator = PDFReportGenerator(report.data)
+    pdf = pdf_generator.generate()
+    
+    # Create the HTTP response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="financial_report_{report.id}.pdf"'
+    response.write(pdf)
+    
     return response
 
 @login_required
