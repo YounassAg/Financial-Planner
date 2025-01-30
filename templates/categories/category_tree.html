@@ -1,0 +1,16 @@
+<li class="pl-4">
+    <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+        <span class="text-gray-700">{{ category.name }}</span>
+        <div class="flex space-x-2">
+            <a href="{% url 'edit_category' category.id %}" class="text-blue-600 hover:text-blue-800">Edit</a>
+            <a href="{% url 'delete_category' category.id %}" class="text-red-600 hover:text-red-800">Delete</a>
+        </div>
+    </div>
+    {% if category.subcategories.all %}
+        <ul class="pl-6 mt-2 space-y-2">
+            {% for subcategory in category.subcategories.all %}
+                {% include 'categories/category_tree.html' with category=subcategory %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>
