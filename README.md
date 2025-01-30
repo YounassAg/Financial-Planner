@@ -1,8 +1,10 @@
 # Financial Planner Web App
 
-<!-- ![Financial Planner Screenshot](screenshot.png) -->
-
 The **Financial Planner** is a powerful web application designed to help users manage their finances effectively. It allows users to track expenses, set budgets, define financial goals, and generate insightful reports. Built with **Django** and **Tailwind CSS**, this app provides a clean, responsive, and user-friendly interface.
+
+![Financial Planner Screenshot](static/images/app_images/dashboard-1.png)
+![Financial Planner Screenshot](static/images/app_images/dashboard-2.png)
+
 
 ---
 
