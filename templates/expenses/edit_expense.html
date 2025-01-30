@@ -14,9 +14,16 @@
         </div>
         <div class="mb-4">
             <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
-            <select name="category" id="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            <select name="parent" id="parent" class="category-select block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 {% for category in categories %}
-                <option value="{{ category.id }}" {% if category.id == expense.category.id %}selected{% endif %}>{{ category.name }}</option>
+                    {% if not category.parent %}
+                        <option value="{{ category.id }}" class="font-medium">{{ category.name }}</option>
+                        {% for sub in categories %}
+                            {% if sub.parent.id == category.id %}
+                                <option value="{{ sub.id }}" class="pl-4">↳ {{ sub.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 {% endfor %}
             </select>
         </div>
