@@ -4,6 +4,7 @@ The **Financial Planner** is a powerful web application designed to help users m
 
 ![Financial Planner Screenshot](static/images/app_images/dashboard-1.png)
 ![Financial Planner Screenshot](static/images/app_images/dashboard-2.png)
+![Financial Planner Screenshot](static/images/app_images/categories.png)
 
 
 ---
