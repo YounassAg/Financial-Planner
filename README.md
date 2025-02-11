@@ -18,7 +18,6 @@ The **Financial Planner** is a powerful web application designed to help users m
 
 ### 2. **Budget Management**
    - Set monthly budgets for different categories.
-   - Receive budget suggestions based on historical spending.
    - Get alerts when you're close to exceeding your budget.
 
 ### 3. **Goal Tracking**
@@ -29,7 +28,7 @@ The **Financial Planner** is a powerful web application designed to help users m
 ### 4. **Reports and Insights**
    - View detailed reports on spending, budgets, and goals.
    - Generate monthly summaries and trend analysis.
-   - Export reports as PDF or CSV.
+   - Export reports.
 
 ### 5. **User Authentication**
    - Secure user accounts with email and password.
