@@ -77,7 +77,8 @@
                             </svg>
                             Reports
                         </a>
-                    </div>                    {% else %}
+                    </div>                    
+                    {% else %}
                     <!-- Public Navigation -->
                     <div class="hidden md:ml-8 md:flex md:space-x-6">
                         <a href="" class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150 {% if request.resolver_match.url_name == 'home' %}nav-link-active{% endif %}">Home</a>
