@@ -16,16 +16,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <!-- Custom CSS for font family -->
     <style>
-        .font-poppins {
-            font-family: 'Poppins', sans-serif;
-        }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .nav-link-active { color: #2563eb; border-bottom: 2px solid #2563eb; }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 font-poppins">
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
-                <!-- Logo and Main Links -->
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <a href="{% url 'home' %}" class="flex items-center space-x-2">
@@ -35,9 +33,10 @@
                             <span class="text-xl font-bold text-blue-600 hover:text-blue-700 transition duration-150">Financial Planner</span>
                         </a>
                     </div>
+                    {% if user.is_authenticated %}
+                    <!-- Authenticated Navigation -->
                     <div class="hidden md:ml-8 md:flex md:space-x-6">
-                        <!-- Expenses -->
-                        <a href="{% url 'expenses' %}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 hover:border-blue-600 transition duration-150 {% if request.resolver_match.url_name == 'expenses' %}nav-link-active{% endif %}">
+                        <a href="{% url 'expenses' %}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150 {% if request.resolver_match.url_name == 'expenses' %}nav-link-active{% endif %}">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
@@ -78,8 +77,17 @@
                             </svg>
                             Reports
                         </a>
+                    </div>                    {% else %}
+                    <!-- Public Navigation -->
+                    <div class="hidden md:ml-8 md:flex md:space-x-6">
+                        <a href="" class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150 {% if request.resolver_match.url_name == 'home' %}nav-link-active{% endif %}">Home</a>
+                        <a href="" class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150 {% if request.resolver_match.url_name == 'features' %}nav-link-active{% endif %}">Features</a>
+                        <a href="" class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150 {% if request.resolver_match.url_name == 'pricing' %}nav-link-active{% endif %}">Pricing</a>
+                        <a href="" class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150 {% if request.resolver_match.url_name == 'about' %}nav-link-active{% endif %}">About</a>
                     </div>
+                    {% endif %}
                 </div>
+
 
                 <!-- User Actions -->
                 <div class="flex items-center">
@@ -159,12 +167,39 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t mt-12">
-        <div class="max-w-7xl mx-auto px-4 py-6">
-            <p class="text-center text-gray-500 text-sm">© 2025 Financial Planner. All rights reserved.</p>
-            <div class="text-center mt-2">
-                <a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Privacy Policy</a>
-                <span class="mx-2 text-gray-400">|</span>
-                <a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Terms of Service</a>
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Financial Planner</h3>
+                    <p class="text-sm text-gray-500">Empowering your financial journey with smart budgeting and tracking solutions.</p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-3">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">Features</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">Pricing</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">About</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-3">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">Blog</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">Help Center</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-3">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">Privacy</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">Terms</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-blue-600">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t mt-8 pt-8 text-center">
+                <p class="text-sm text-gray-500">&copy; 2025 Financial Planner. All rights reserved.</p>
             </div>
         </div>
     </footer>
